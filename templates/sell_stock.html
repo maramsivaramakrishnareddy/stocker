@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width:520px;">
+        <h2>📉 Sell Stock</h2>
+        <p class="auth-subtitle">Sell shares of {{ stock.name }}</p>
+
+        <div class="ai-box" style="margin-bottom:1.5rem;">
+            <h3>💼 Your Position</h3>
+            <p>Symbol: <strong>{{ stock.symbol }}</strong></p>
+            <p>Current Price: <strong class="price">${{ stock.price }}</strong></p>
+            {% if portfolio %}
+            <p>Shares Owned: <strong>{{ portfolio.quantity }}</strong></p>
+            <p>Avg Buy Price: <strong>${{ "%.2f"|format(portfolio.average_price|float) }}</strong></p>
+            {% set pnl = (stock.price|float - portfolio.average_price|float) * portfolio.quantity|int %}
+            <p>P&L: <strong class="{{ 'profit' if pnl > 0 else 'loss' }}">
+                ${{ "%.2f"|format(pnl) }}
+            </strong></p>
+            {% else %}
+            <p class="loss">⚠️ You don't own this stock!</p>
+            {% endif %}
+        </div>
+
+        {% if portfolio %}
+        <form method="POST" action="/sell">
+            <input type="hidden" name="stock_id" value="{{ stock.id }}">
+            <div class="form-group">
+                <label>Quantity to Sell</label>
+                <input type="number" name="quantity" min="1"
+                    max="{{ portfolio.quantity }}" value="1" required>
+            </div>
+            <div class="form-group">
+                <label>Estimated Returns</label>
+                <input type="text" id="returns" value="${{ stock.price }}" readonly
+                    style="opacity:0.6;cursor:not-allowed;">
+            </div>
+            <button type="submit" class="btn-sell full-width"
+                style="width:100%;padding:0.85rem;font-size:1rem;border-radius:50px;">
+                ✅ Confirm Sell
+            </button>
+        </form>
+        {% endif %}
+        <br>
+        <a href="/dashboard" class="btn-secondary full-width"
+            style="display:block;text-align:center;">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<script>
+    const price = parseFloat("{{ stock.price }}");
+    const qtyInput = document.querySelector('input[name="quantity"]');
+    const returnsInput = document.getElementById('returns');
+    if(qtyInput) {
+        qtyInput.addEventListener('input', function() {
+            const returns = (price * this.value).toFixed(2);
+            returnsInput.value = '$' + returns;
+        });
+    }
+</script>
+{% endblock %}

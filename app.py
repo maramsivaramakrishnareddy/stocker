@@ -412,6 +412,66 @@ def delete_trader(email):
     flash(f'Trader {email} deleted!', 'success')
     return redirect(url_for('admin_dashboard'))
 
+
+    # ── SERVICE ROUTES ────────────────────────────────────────
+@app.route('/service1')
+def service1():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    stock = next((s for s in MOCK_STOCKS if s['id'] == 'AAPL'), None)
+    return render_template('service-details-1.html', stock=stock)
+
+@app.route('/service2')
+def service2():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    stock = next((s for s in MOCK_STOCKS if s['id'] == 'GOOGL'), None)
+    return render_template('service-details-2.html', stock=stock)
+
+@app.route('/service3')
+def service3():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    stock = next((s for s in MOCK_STOCKS if s['id'] == 'MSFT'), None)
+    return render_template('service-details-3.html', stock=stock)
+
+@app.route('/service4')
+def service4():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    stock = next((s for s in MOCK_STOCKS if s['id'] == 'TSLA'), None)
+    return render_template('service-details-4.html', stock=stock)
+
+@app.route('/service5')
+def service5():
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    stock = next((s for s in MOCK_STOCKS if s['id'] == 'NVDA'), None)
+    return render_template('service-details-5.html', stock=stock)
+
+# ── BUY PAGE ──────────────────────────────────────────────
+@app.route('/buy_page/<stock_id>')
+def buy_page(stock_id):
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    stock = next((s for s in MOCK_STOCKS if s['id'] == stock_id), None)
+    return render_template('buy_stock.html', stock=stock)
+
+# ── SELL PAGE ─────────────────────────────────────────────
+@app.route('/sell_page/<stock_id>')
+def sell_page(stock_id):
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    db = get_dynamodb()
+    if db:
+        portfolio = db.Table('stocker_portfolio').get_item(
+            Key={'user_id': session['email'], 'stock_id': stock_id}
+        ).get('Item')
+    else:
+        portfolio = LOCAL_PORTFOLIO.get(session['email'], {}).get(stock_id)
+    stock = next((s for s in MOCK_STOCKS if s['id'] == stock_id), None)
+    return render_template('sell_stock.html', stock=stock, portfolio=portfolio)
+
 # ─── MAIN ─────────────────────────────────────────────────
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
