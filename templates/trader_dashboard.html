@@ -20,6 +20,7 @@
                         <th>Company</th>
                         <th>Price</th>
                         <th>Sector</th>
+                        <th>Details</th>
                         <th>Buy</th>
                     </tr>
                 </thead>
@@ -31,11 +32,18 @@
                         <td class="price">${{ stock.price }}</td>
                         <td>{{ stock.sector }}</td>
                         <td>
-                            <form method="POST" action="/buy" style="display:flex;gap:6px;">
-                                <input type="hidden" name="stock_id" value="{{ stock.id }}">
-                                <input type="number" name="quantity" min="1" value="1" class="qty-input">
-                                <button type="submit" class="btn-buy">Buy</button>
-                            </form>
+                            <a href="/service{{ loop.index }}"
+                                class="btn-buy"
+                                style="padding:0.4rem 1rem;text-decoration:none;display:inline-block;background:linear-gradient(135deg,var(--accent-blue),var(--accent-purple));color:white;">
+                                View
+                            </a>
+                        </td>
+                        <td>
+                            <a href="/buy_page/{{ stock.id }}"
+                                class="btn-buy"
+                                style="padding:0.4rem 1rem;text-decoration:none;display:inline-block;">
+                                Buy
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -74,11 +82,11 @@
                             ${{ "%.2f"|format(pnl|float) }}
                         </td>
                         <td>
-                            <form method="POST" action="/sell" style="display:flex;gap:6px;">
-                                <input type="hidden" name="stock_id" value="{{ item.stock_id }}">
-                                <input type="number" name="quantity" min="1" max="{{ item.quantity }}" value="1" class="qty-input">
-                                <button type="submit" class="btn-sell">Sell</button>
-                            </form>
+                            <a href="/sell_page/{{ item.stock_id }}"
+                                class="btn-sell"
+                                style="padding:0.4rem 1rem;text-decoration:none;display:inline-block;">
+                                Sell
+                            </a>
                         </td>
                     </tr>
                     {% endif %}
