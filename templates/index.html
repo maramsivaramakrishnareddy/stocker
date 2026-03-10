@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero">
+    <div class="hero-content">
+        <h1>Welcome to <span class="highlight">Stocker</span></h1>
+        <p>Next-generation cloud-native stock trading platform powered by AWS</p>
+        <div class="hero-btns">
+            <a href="/signup" class="btn-primary">Get Started</a>
+            <a href="/login" class="btn-secondary">Login</a>
+        </div>
+    </div>
+    <div class="hero-features">
+        <div class="feature-card">
+            <h3>🔒 Secure Auth</h3>
+            <p>Encrypted passwords & session management</p>
+        </div>
+        <div class="feature-card">
+            <h3>⚡ Real-Time Trading</h3>
+            <p>Buy & sell stocks instantly</p>
+        </div>
+        <div class="feature-card">
+            <h3>📊 Portfolio Tracking</h3>
+            <p>Monitor your investments live</p>
+        </div>
+        <div class="feature-card">
+            <h3>🤖 AI Suggestions</h3>
+            <p>Smart investment recommendations</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

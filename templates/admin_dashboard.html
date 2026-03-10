@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard">
+    <h2>🛡️ Admin Dashboard</h2>
+
+    <!-- All Users -->
+    <div class="section">
+        <h3>👥 All Traders</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td class="status-completed">Active</td>
+                        <td>
+                            {% if user.role != 'admin' %}
+                            <form method="POST" action="/delete_trader/{{ user.email }}">
+                                <button type="submit" class="btn-sell"
+                                    onclick="return confirm('Delete this trader?')">
+                                    Delete
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- All Transactions -->
+    <div class="section">
+        <h3>📋 All Transactions</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Stock</th>
+                        <th>Action</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for txn in transactions %}
+                    <tr>
+                        <td>{{ txn.user_id }}</td>
+                        <td><strong>{{ txn.stock_id }}</strong></td>
+                        <td class="{{ 'buy-badge' if txn.action == 'buy' else 'sell-badge' }}">
+                            {{ txn.action | upper }}
+                        </td>
+                        <td>{{ txn.quantity }}</td>
+                        <td>${{ txn.price }}</td>
+                        <td>{{ txn.transaction_date[:10] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

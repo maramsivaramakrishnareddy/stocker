@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard">
+    <h2>📊 Trader Dashboard — {{ session.username }}</h2>
+
+    <!-- AI Suggestion Box -->
+    <div class="ai-box">
+        <h3>🤖 AI Smart Suggestion</h3>
+        <p>{{ suggestion }}</p>
+    </div>
+
+    <!-- Available Stocks -->
+    <div class="section">
+        <h3>📈 Available Stocks</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Company</th>
+                        <th>Price</th>
+                        <th>Sector</th>
+                        <th>Buy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr>
+                        <td><strong>{{ stock.symbol }}</strong></td>
+                        <td>{{ stock.name }}</td>
+                        <td class="price">${{ stock.price }}</td>
+                        <td>{{ stock.sector }}</td>
+                        <td>
+                            <form method="POST" action="/buy" style="display:flex;gap:6px;">
+                                <input type="hidden" name="stock_id" value="{{ stock.id }}">
+                                <input type="number" name="quantity" min="1" value="1" class="qty-input">
+                                <button type="submit" class="btn-buy">Buy</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- My Portfolio -->
+    <div class="section">
+        <h3>💼 My Portfolio</h3>
+        {% if portfolio %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stock</th>
+                        <th>Quantity</th>
+                        <th>Avg Price</th>
+                        <th>Current Price</th>
+                        <th>P&L</th>
+                        <th>Sell</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in portfolio %}
+                    {% set current = stocks | selectattr('id', 'equalto', item.stock_id) | first %}
+                    {% if current %}
+                    {% set pnl = (current.price - item.average_price) * item.quantity %}
+                    <tr>
+                        <td><strong>{{ item.stock_id }}</strong></td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ "%.2f"|format(item.average_price|float) }}</td>
+                        <td>${{ current.price }}</td>
+                        <td class="{{ 'profit' if pnl > 0 else 'loss' }}">
+                            ${{ "%.2f"|format(pnl|float) }}
+                        </td>
+                        <td>
+                            <form method="POST" action="/sell" style="display:flex;gap:6px;">
+                                <input type="hidden" name="stock_id" value="{{ item.stock_id }}">
+                                <input type="number" name="quantity" min="1" max="{{ item.quantity }}" value="1" class="qty-input">
+                                <button type="submit" class="btn-sell">Sell</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-msg">No stocks in portfolio yet. Start buying! 🚀</p>
+        {% endif %}
+    </div>
+
+    <!-- Transaction History -->
+    <div class="section">
+        <h3>📋 Transaction History</h3>
+        {% if transactions %}
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stock</th>
+                        <th>Action</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for txn in transactions %}
+                    <tr>
+                        <td><strong>{{ txn.stock_id }}</strong></td>
+                        <td class="{{ 'buy-badge' if txn.action == 'buy' else 'sell-badge' }}">
+                            {{ txn.action | upper }}
+                        </td>
+                        <td>{{ txn.quantity }}</td>
+                        <td>${{ txn.price }}</td>
+                        <td class="status-completed">{{ txn.status }}</td>
+                        <td>{{ txn.transaction_date[:10] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty-msg">No transactions yet!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
